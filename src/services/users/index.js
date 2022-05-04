@@ -1,31 +1,31 @@
 import express from "express";
-import usersModel from "./model.js";
+import UsersModel from "./model.js";
 
 const usersRouter = express.Router();
 
 usersRouter.post("/", async (req, res) => {
 	console.log("REQUEST BODY: ", req.body);
 
-	const newUser = new usersModel(red.body);
+	const newUser = new UsersModel(req.body);
 	const savedUser = await newUser.save(); //Save the body in the Users Collection
 
 	res.send(savedUser);
 });
 
 usersRouter.get("/", async (req, res) => {
-	const users = await usersModel.find();
+	const users = await UsersModel.find();
 
 	res.send(users);
 });
 
 usersRouter.get("/:userId", async (req, res) => {
-	const user = await usersModel.findById(req.params.userId);
+	const user = await UsersModel.findById(req.params.userId);
 
 	res.send(user);
 });
 
 usersRouter.put("/:userId", async (req, res) => {
-	const updateUser = await usersModel.findByIdAndUpdate(
+	const updateUser = await UsersModel.findByIdAndUpdate(
 		req.params.userId,
 		req.body,
 		{ new: true }
@@ -35,7 +35,7 @@ usersRouter.put("/:userId", async (req, res) => {
 });
 
 usersRouter.delete("/:userId", async (req, res) => {
-	await usersModel.findByIdAndDelete(req.params.userId);
+	await UsersModel.findByIdAndDelete(req.params.userId);
 	res.status(204).send();
 });
 

@@ -15,7 +15,7 @@ server.use("/authors", authorsRouter);
 
 // DATABASE CONNECTION
 
-mongoose.connect("mongodb://localhost:27027/mongoDBExample");
+mongoose.connect(process.env.MONGO_CONNECTION_URL);
 
 mongoose.connection.on("connected", () => {
 	server.listen(port, () => {
