@@ -12,20 +12,24 @@ const port = 3001;
 // Just a console.log()
 const loggerMiddleware = (req, res, next) => {
 	console.log(`Incoming request --> ${req.method} -- ${new Date()}`);
-	req.name = "Renan";
 	next();
 };
 // Fake authentication
-const fakeAuthenticationMiddleware = (req, res, next) => {
-	if (req.name === "Renan") {
-		next();
-	} else {
-		res.status(401).send("Only Renan's allowed");
-	}
-};
-// ** GLOBAL LEVEL MIDDLEWARES **
+// I commented out this middlware because it was made just as a example
+
+// const fakeAuthenticationMiddleware = (req, res, next) => {
+// 	if (req.name === "Renan") {
+// 		next();
+// 	} else {
+// 		res.status(401).send("Only Renan's allowed");
+// 	}
+// };
+
+// *************** GLOBAL LEVEL MIDDLEWARES ************
+
 server.use(loggerMiddleware);
-server.use(fakeAuthenticationMiddleware);
+
+// server.use(fakeAuthenticationMiddleware);
 
 server.use(express.json());
 
