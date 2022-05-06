@@ -3,6 +3,11 @@ import UsersModel from "./model.js";
 
 const usersRouter = express.Router();
 
+const firstArautoMiddleware = (req, res, next) => {
+	console.log("I am the first Arauto Middleware");
+	next();
+};
+
 usersRouter.post("/", async (req, res) => {
 	console.log("REQUEST BODY: ", req.body);
 
@@ -12,7 +17,7 @@ usersRouter.post("/", async (req, res) => {
 	res.send(savedUser);
 });
 
-usersRouter.get("/", async (req, res) => {
+usersRouter.get("/", firstArautoMiddleware, async (req, res) => {
 	const users = await UsersModel.find();
 
 	res.send(users);
