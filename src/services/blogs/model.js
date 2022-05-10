@@ -13,9 +13,8 @@ const blogSchema = new Schema(
 			unit: { type: String, required: true },
 		},
 		author: {
-			type: Object,
-			name: { type: String, required: true },
-			avatar: { type: String, required: true },
+			type: mongoose.SchemaTypes.ObjectId,
+			ref: "authors",
 		},
 		content: { type: String, required: true },
 	},
@@ -24,4 +23,4 @@ const blogSchema = new Schema(
 	}
 );
 
-export default model("Blog", blogSchema);
+export default model("blogs", blogSchema);
