@@ -2,6 +2,7 @@ import express from "express";
 import createError from "http-errors";
 import BlogModel from "./model.js";
 import { checkBlogMiddleware, checkVdalidationResult } from "./validation.js";
+import query2Mongo from "query-to-mongo";
 
 const blogsRouter = express.Router();
 
@@ -24,8 +25,30 @@ blogsRouter.post(
 
 blogsRouter.get("/", async (req, res, next) => {
 	try {
-		const blog = await BlogModel.find();
-		res.send(blog);
+		console.log("MONGO QUERY -->", query2Mongo(req.query));
+
+		const mongoQuery = query2Mongo(req.query);
+
+		const total = await BlogModel.countDocuments(mongoQuery.criteria);
+
+		if (!mongoQuery.options.skip) mongoQuery.options.skip = 0;
+
+		if (!mongoQuery.options.limit || mongoQuery.options.limit > 10)
+			mongoQuery.options.limit = 20;
+
+		const blog = await BlogModel.find(
+			mongoQuery.criteria,
+			mongoQuery.options.fields
+		)
+			.skip(mongoQuery.options.skip)
+			.limit(mongoQuery.options.limit)
+			.sort(mongoQuery.options.sort);
+		res.send({
+			links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
+			total,
+			totalPages: Math.ceil(total / mongoQuery.options.limit),
+			blog,
+		});
 	} catch (error) {
 		next(error);
 	}
