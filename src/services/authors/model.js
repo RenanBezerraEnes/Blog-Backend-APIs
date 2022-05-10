@@ -15,4 +15,4 @@ const authorsScheme = new Schema(
 	}
 );
 
-export default model("Authors", authorsScheme);
+export default model("authors", authorsScheme);
