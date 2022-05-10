@@ -42,7 +42,8 @@ blogsRouter.get("/", async (req, res, next) => {
 		)
 			.skip(mongoQuery.options.skip)
 			.limit(mongoQuery.options.limit)
-			.sort(mongoQuery.options.sort);
+			.sort(mongoQuery.options.sort)
+			.populate("author");
 		res.send({
 			links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
 			total,
@@ -56,7 +57,7 @@ blogsRouter.get("/", async (req, res, next) => {
 
 blogsRouter.get("/:blogId", async (req, res, next) => {
 	try {
-		const blog = await BlogModel.findById(req.params.blogId);
+		const blog = await BlogModel.findById(req.params.blogId).populate("author");
 		if (blog) {
 			res.send(blog);
 		} else {
