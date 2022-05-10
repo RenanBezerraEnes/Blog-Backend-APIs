@@ -34,20 +34,20 @@ const schema = {
 			},
 		},
 	},
-	author: {
-		name: {
-			in: ["body"],
-			isString: {
-				errorMessage: "Name validation failed!",
-			},
-		},
-		avatar: {
-			in: ["body"],
-			isString: {
-				errorMessage: "Avatar validation failed!",
-			},
-		},
-	},
+	// author: {
+	// 	name: {
+	// 		in: ["body"],
+	// 		isString: {
+	// 			errorMessage: "Name validation failed!",
+	// 		},
+	// 	},
+	// 	avatar: {
+	// 		in: ["body"],
+	// 		isString: {
+	// 			errorMessage: "Avatar validation failed!",
+	// 		},
+	// 	},
+	// },
 	content: {
 		in: ["body"],
 		isString: {
