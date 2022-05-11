@@ -17,33 +17,20 @@ const server = express();
 
 const port = 3001;
 
-// Just a console.log()
 const loggerMiddleware = (req, res, next) => {
 	console.log(`Incoming request --> ${req.method} -- ${new Date()}`);
 	next();
 };
-// Fake authentication
-// I commented out this middlware because it was made just as a example
-
-// const fakeAuthenticationMiddleware = (req, res, next) => {
-// 	if (req.name === "Renan") {
-// 		next();
-// 	} else {
-// 		res.status(401).send("Only Renan's allowed");
-// 	}
-// };
 
 // *************** GLOBAL LEVEL MIDDLEWARES ************
+
 server.use(cors());
 server.use(loggerMiddleware);
-
-// server.use(fakeAuthenticationMiddleware);
-
 server.use(express.json());
 
 // HERE I HAVE A ROUTER LEVEL MIDDLEWARE --->
-server.use("/users", loggerMiddleware, usersRouter);
 
+server.use("/users", loggerMiddleware, usersRouter);
 server.use("/authors", authorsRouter);
 server.use("/blogPosts", blogsRouter);
 

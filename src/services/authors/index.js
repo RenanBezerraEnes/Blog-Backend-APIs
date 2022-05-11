@@ -58,7 +58,7 @@ authorsRouter.get("/", async (req, res) => {
 // GET /authors/:id/blogPosts/ => get all the posts for an author with a given ID
 authorsRouter.get("/:authorId/blogPosts", async (req, res) => {
 	try {
-		const blog = await BlogModel.findById(req.params.authorId);
+		const blog = await BlogModel.find({ author: req.params.authorId });
 		if (blog) {
 			res.send(blog);
 		} else {
