@@ -158,6 +158,27 @@ blogsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
 
 blogsRouter.put("/:blogId/comments/:commentId", async (req, res, next) => {
 	try {
+		const commentsUpdate = await BlogModel.findById(req.params.blogId);
+
+		if (commentsUpdate) {
+			const commentsIndex = commentsUpdate.comments.findIndex(
+				(comment) => comment._id.toString() === req.params.commentId
+			);
+			if (commentsIndex !== -1) {
+				const oldObject = commentsUpdate.comments[commentsIndex].toObject();
+
+				commentsUpdate.comments[commentsIndex] = { ...oldObject, ...req.body };
+
+				await commentsUpdate.save();
+				res.send(commentsUpdate);
+			} else {
+				next(
+					createError(404, `Comment with id ${req.params.blogId} not found!`)
+				);
+			}
+		} else {
+			next(createError(404, `Comment with id ${req.params.blogId} not found!`));
+		}
 	} catch (error) {
 		next(error);
 	}
@@ -165,6 +186,16 @@ blogsRouter.put("/:blogId/comments/:commentId", async (req, res, next) => {
 
 blogsRouter.delete("/:blogId/comments/:commentId", async (req, res, next) => {
 	try {
+		const deleteComments = await BlogModel.findByIdAndUpdate(
+			req.params.blogId,
+			{ $pull: { comments: { _id: req.params.commentId } } },
+			{ new: true }
+		);
+		if (deleteComments) {
+			res.send(deleteComments);
+		} else {
+			next(createError(404, `Comment with id ${req.params.blogId} not found!`));
+		}
 	} catch (error) {
 		next(error);
 	}
