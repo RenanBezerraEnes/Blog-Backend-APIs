@@ -3,6 +3,7 @@ import createError from "http-errors";
 import BlogModel from "./model.js";
 import { checkBlogMiddleware, checkVdalidationResult } from "./validation.js";
 import query2Mongo from "query-to-mongo";
+// import res from "express/lib/response";
 
 const blogsRouter = express.Router();
 
@@ -93,6 +94,77 @@ blogsRouter.delete("/:blogId", async (req, res, next) => {
 		} else {
 			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
 		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+// ********************************************** BOOKS COMMENTS ************************************************************
+
+blogsRouter.post("/comments/:blogId", async (req, res, next) => {
+	try {
+		const commentsUpdate = await BlogModel.findByIdAndUpdate(
+			req.params.blogId,
+			{
+				$push: { comments: { ...req.body, commentDate: new Date() } },
+			},
+			{ new: true }
+		);
+		console.log(commentsUpdate);
+		if (commentsUpdate) {
+			res.send(commentsUpdate);
+		} else {
+			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogsRouter.get("/comments/:blogId", async (req, res, next) => {
+	try {
+		const blogs = await BlogModel.findById(req.params.blogId);
+		if (blogs) {
+			res.send(blogs.comments);
+		} else {
+			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogsRouter.get("/:blogId/comments/:commentId", async (req, res, next) => {
+	try {
+		const getComments = await BlogModel.findById(req.params.blogId);
+		if (getComments) {
+			const comment = getComments.comments.find(
+				(comment) => comment._id.toString() === req.params.commentId
+			);
+			if (comment) {
+				res.send(comment);
+			} else {
+				next(
+					createError(404, `Comment with id ${req.params.blogId} not found!`)
+				);
+			}
+		} else {
+			next(createError(404, `Comment with id ${req.params.blogId} not found!`));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogsRouter.put("/:blogId/comments/:commentId", async (req, res, next) => {
+	try {
+	} catch (error) {
+		next(error);
+	}
+});
+
+blogsRouter.delete("/:blogId/comments/:commentId", async (req, res, next) => {
+	try {
 	} catch (error) {
 		next(error);
 	}
