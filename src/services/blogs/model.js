@@ -17,6 +17,7 @@ const blogSchema = new Schema(
 			ref: "authors",
 		},
 		content: { type: String, required: true },
+		comments: [{ comment: String, commentDate: Date }],
 	},
 	{
 		timestamps: true,
