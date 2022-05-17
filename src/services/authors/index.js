@@ -4,6 +4,7 @@ import BlogModel from "./model.js";
 import createError from "http-errors";
 import { checkAuthorMiddleware, checkVdalidationResult } from "./validation.js";
 import query2Mongo from "query-to-mongo";
+import { cloudinaryUploader } from "../../lib/cloudiary.js";
 
 const authorsRouter = express.Router();
 
@@ -11,7 +12,7 @@ authorsRouter.post(
 	"/",
 	checkAuthorMiddleware,
 	checkVdalidationResult,
-	async (req, res) => {
+	async (req, res, next) => {
 		try {
 			const newAuthor = new AuthorsModel(req.body);
 			const savedAuthor = await newAuthor.save();
@@ -23,7 +24,7 @@ authorsRouter.post(
 	}
 );
 
-authorsRouter.get("/", async (req, res) => {
+authorsRouter.get("/", async (req, res, next) => {
 	try {
 		const mongoQuery = query2Mongo(req.query);
 
@@ -113,5 +114,32 @@ authorsRouter.delete("/:authorId", async (req, res) => {
 		next(error);
 	}
 });
+
+// AUTHORS AVATAR POST
+
+authorsRouter.post(
+	"/:authorId/avatar",
+	cloudinaryUploader,
+	async (req, res, next) => {
+		try {
+			console.log(req.file.path, "LOOK ME");
+			const avatarUpdate = await AuthorsModel.findByIdAndUpdate(
+				req.params.authorId,
+				{
+					avatar: req.file.path,
+				},
+				{ new: true }
+			);
+			if (avatarUpdate) {
+				res.send(avatarUpdate);
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+);
 
 export default authorsRouter;
