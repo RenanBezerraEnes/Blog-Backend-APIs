@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/RenanBezerraEnes/Module---6--Week-1---part-1---DataBase#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.2",
     "cloudinary": "^1.30.0",
     "cors": "^2.8.5",
     "express": "^4.18.1",
