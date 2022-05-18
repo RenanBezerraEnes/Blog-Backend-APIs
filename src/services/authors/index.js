@@ -5,6 +5,7 @@ import createError from "http-errors";
 import { checkAuthorMiddleware, checkVdalidationResult } from "./validation.js";
 import query2Mongo from "query-to-mongo";
 import { cloudinaryUploader } from "../../lib/cloudiary.js";
+import { authorWelcome } from "../../lib/sendEmail.js";
 
 const authorsRouter = express.Router();
 
@@ -16,10 +17,13 @@ authorsRouter.post(
 		try {
 			const newAuthor = new AuthorsModel(req.body);
 			const savedAuthor = await newAuthor.save();
+			const { email, name } = req.body;
 
+			await authorWelcome(email, name);
 			res.send(savedAuthor);
 		} catch (error) {
-			next(error);
+			console.log(error);
+			//next(error);
 		}
 	}
 );
