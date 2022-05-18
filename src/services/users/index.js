@@ -2,6 +2,7 @@ import express from "express";
 import UsersModel from "./model.js";
 import createError from "http-errors";
 import { checkUserMiddleware, checkVdalidationResult } from "./validation.js";
+import { sendEmail } from "../../lib/sendEmail.js";
 
 const usersRouter = express.Router();
 
@@ -69,6 +70,19 @@ usersRouter.delete("/:userId", async (req, res, next) => {
 		} else {
 			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
 		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+// SEND EMAIL
+
+usersRouter.post("/email", async (req, res, next) => {
+	try {
+		const { email } = req.body;
+
+		await sendEmail(email);
+		res.send({ message: "Email sent sucessfully, check your box!" });
 	} catch (error) {
 		next(error);
 	}

@@ -7,7 +7,7 @@ export const cloudinaryUploader = multer({
 	storage: new CloudinaryStorage({
 		cloudinary,
 		params: {
-			folder: "Blog Application/Authors - Avatar",
+			folder: "Blog Application/Avatars",
 		},
 	}),
 	limits: { fileSize: 1 * 1024 * 1024 },
