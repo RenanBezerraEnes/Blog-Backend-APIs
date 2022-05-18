@@ -3,7 +3,8 @@ import createError from "http-errors";
 import BlogModel from "./model.js";
 import { checkBlogMiddleware, checkVdalidationResult } from "./validation.js";
 import query2Mongo from "query-to-mongo";
-// import res from "express/lib/response";
+import { cloudinaryUploader } from "../../lib/cloudiary.js";
+import { newBlogPosted } from "../../lib/sendEmail.js";
 
 const blogsRouter = express.Router();
 
@@ -15,10 +16,16 @@ blogsRouter.post(
 		console.log("REQUEST BODY: ", req.body);
 		try {
 			const newBlog = await new BlogModel(req.body);
-			const savedBlog = await newBlog.save(); //Save the body in the Users Collection
+			const savedBlog = await newBlog.save();
+
+			const blogPostWithAuthor = await newBlog.populate("author");
+			const { author } = blogPostWithAuthor;
+
+			await newBlogPosted(author.email, author.name, req.body.title);
 
 			res.send(savedBlog);
 		} catch (error) {
+			console.log(error);
 			next(error);
 		}
 	}
@@ -200,5 +207,32 @@ blogsRouter.delete("/:blogId/comments/:commentId", async (req, res, next) => {
 		next(error);
 	}
 });
+
+// Blogs AVATAR POST
+
+blogsRouter.post(
+	"/:blogId/cover",
+	cloudinaryUploader,
+	async (req, res, next) => {
+		try {
+			console.log(req.file.path, "LOOK ME");
+			const blogsAvatar = await BlogModel.findByIdAndUpdate(
+				req.params.blogId,
+				{
+					cover: req.file.path,
+				},
+				{ new: true }
+			);
+			if (blogsAvatar) {
+				res.send(blogsAvatar);
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			console.log(error);
+			next(error);
+		}
+	}
+);
 
 export default blogsRouter;
