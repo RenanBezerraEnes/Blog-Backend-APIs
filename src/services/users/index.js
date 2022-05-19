@@ -7,11 +7,10 @@ import { sendEmail } from "../../lib/sendEmail.js";
 const usersRouter = express.Router();
 
 usersRouter.post(
-	"/",
+	"/register",
 	checkUserMiddleware,
 	checkVdalidationResult,
 	async (req, res, next) => {
-		console.log("REQUEST BODY: ", req.body);
 		try {
 			const newUser = new UsersModel(req.body);
 			const savedUser = await newUser.save();
