@@ -45,4 +45,23 @@ usersScheme.methods.toJSON = function () {
 	return userObject;
 };
 
+// To check the credencials, for example if this email and password is correct than, it's possible to login, otherwise 401 status
+usersScheme.statics.checkCredencials = async function (email, plainPassword) {
+	const user = await this.findOne({ email });
+
+	if (user) {
+		const isPasswordCorrect = await bcrypt.compare(
+			plainPassword,
+			user.password
+		);
+		if (isPasswordCorrect) {
+			return user;
+		} else {
+			return null;
+		}
+	} else {
+		return null;
+	}
+};
+
 export default model("User", usersScheme);

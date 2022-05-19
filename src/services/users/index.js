@@ -22,6 +22,21 @@ usersRouter.post(
 	}
 );
 
+usersRouter.post("/login", async (req, res, next) => {
+	try {
+		const { email, password } = req.body;
+
+		const user = await UsersModel.checkCredencials(email, password);
+		if (user) {
+			res.send({ message: "Credentials are OK!" });
+		} else {
+			next(createError(401, "Credentials are not valid!"));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
 usersRouter.get("/", async (req, res, next) => {
 	try {
 		const users = await UsersModel.find();
