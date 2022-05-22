@@ -10,6 +10,12 @@ const usersScheme = new Schema(
 		email: { type: String, required: true },
 		dateOfBirth: { type: Date, required: true },
 		password: { type: String, required: true },
+		role: {
+			type: String,
+			required: true,
+			default: "User",
+			enum: ["User", "Admin"],
+		},
 	},
 	{
 		timestamps: true,

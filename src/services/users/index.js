@@ -3,6 +3,9 @@ import UsersModel from "./model.js";
 import createError from "http-errors";
 import { checkUserMiddleware, checkVdalidationResult } from "./validation.js";
 import { sendEmail } from "../../lib/sendEmail.js";
+import { generateJWTToken } from "../../lib/auth/tools.js";
+import { JWTAuthMiddleware } from "../../lib/auth/token.js";
+import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
 
 const usersRouter = express.Router();
 
@@ -28,7 +31,8 @@ usersRouter.post("/login", async (req, res, next) => {
 
 		const user = await UsersModel.checkCredencials(email, password);
 		if (user) {
-			res.send({ message: "Credentials are OK!" });
+			const token = await generateJWTToken({ _id: user._id, role: user.role });
+			res.send({ accessToken: token });
 		} else {
 			next(createError(401, "Credentials are not valid!"));
 		}
@@ -37,57 +41,86 @@ usersRouter.post("/login", async (req, res, next) => {
 	}
 });
 
-usersRouter.get("/", async (req, res, next) => {
+usersRouter.get(
+	"/",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const users = await UsersModel.find();
+			res.send(users);
+		} catch (error) {
+			next(error);
+		}
+	}
+);
+
+usersRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
 	try {
-		const users = await UsersModel.find();
-		res.send(users);
+		const currentLoggedInUser = await UsersModel.findById(req.user._id);
+		res.send({ user: currentLoggedInUser });
 	} catch (error) {
 		next(error);
 	}
 });
 
-usersRouter.get("/:userId", async (req, res, next) => {
-	try {
-		const user = await UsersModel.findById(req.params.userId);
-		if (user) {
-			res.send(user);
-		} else {
-			next(createError(404, `User with id ${req.params.userId} not found`));
+usersRouter.get(
+	"/:userId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const user = await UsersModel.findById(req.params.userId);
+			if (user) {
+				res.send(user);
+			} else {
+				next(createError(404, `User with id ${req.params.userId} not found`));
+			}
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
-usersRouter.put("/:userId", async (req, res, next) => {
-	try {
-		const updateUser = await UsersModel.findByIdAndUpdate(
-			req.params.userId,
-			req.body,
-			{ new: true }
-		);
-		if (updateUser) {
-			res.send(updateUser);
-		} else {
-			next(createError(404, `User with id ${req.params.userId} not found`));
+usersRouter.put(
+	"/:userId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const updateUser = await UsersModel.findByIdAndUpdate(
+				req.params.userId,
+				req.body,
+				{ new: true }
+			);
+			if (updateUser) {
+				res.send(updateUser);
+			} else {
+				next(createError(404, `User with id ${req.params.userId} not found`));
+			}
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
-usersRouter.delete("/:userId", async (req, res, next) => {
-	try {
-		const deleteUser = await UsersModel.findByIdAndDelete(req.params.userId);
-		if (deleteUser) {
-			res.status(204).send();
-		} else {
-			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+usersRouter.delete(
+	"/:userId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const deleteUser = await UsersModel.findByIdAndDelete(req.params.userId);
+			if (deleteUser) {
+				res.status(204).send();
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
 // SEND EMAIL
 
