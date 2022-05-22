@@ -5,6 +5,8 @@ import { checkBlogMiddleware, checkVdalidationResult } from "./validation.js";
 import query2Mongo from "query-to-mongo";
 import { cloudinaryUploader } from "../../lib/cloudiary.js";
 import { newBlogPosted } from "../../lib/sendEmail.js";
+import { JWTAuthMiddleware } from "../../lib/auth/token.js";
+import { adminOnlyMiddleware } from "../../lib/auth/admin.js";
 
 const blogsRouter = express.Router();
 
@@ -12,6 +14,8 @@ blogsRouter.post(
 	"/",
 	checkBlogMiddleware,
 	checkVdalidationResult,
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
 	async (req, res, next) => {
 		console.log("REQUEST BODY: ", req.body);
 		try {
@@ -31,80 +35,102 @@ blogsRouter.post(
 	}
 );
 
-blogsRouter.get("/", async (req, res, next) => {
-	try {
-		console.log("MONGO QUERY -->", query2Mongo(req.query));
+blogsRouter.get(
+	"/",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			console.log("MONGO QUERY -->", query2Mongo(req.query));
 
-		const mongoQuery = query2Mongo(req.query);
+			const mongoQuery = query2Mongo(req.query);
 
-		const total = await BlogModel.countDocuments(mongoQuery.criteria);
+			const total = await BlogModel.countDocuments(mongoQuery.criteria);
 
-		if (!mongoQuery.options.skip) mongoQuery.options.skip = 0;
+			if (!mongoQuery.options.skip) mongoQuery.options.skip = 0;
 
-		if (!mongoQuery.options.limit || mongoQuery.options.limit > 10)
-			mongoQuery.options.limit = 20;
+			if (!mongoQuery.options.limit || mongoQuery.options.limit > 10)
+				mongoQuery.options.limit = 20;
 
-		const blog = await BlogModel.find(
-			mongoQuery.criteria,
-			mongoQuery.options.fields
-		)
-			.skip(mongoQuery.options.skip)
-			.limit(mongoQuery.options.limit)
-			.sort(mongoQuery.options.sort)
-			.populate("author");
-		res.send({
-			links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
-			total,
-			totalPages: Math.ceil(total / mongoQuery.options.limit),
-			blog,
-		});
-	} catch (error) {
-		next(error);
-	}
-});
-
-blogsRouter.get("/:blogId", async (req, res, next) => {
-	try {
-		const blog = await BlogModel.findById(req.params.blogId).populate("author");
-		if (blog) {
-			res.send(blog);
-		} else {
-			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			const blog = await BlogModel.find(
+				mongoQuery.criteria,
+				mongoQuery.options.fields
+			)
+				.skip(mongoQuery.options.skip)
+				.limit(mongoQuery.options.limit)
+				.sort(mongoQuery.options.sort)
+				.populate("author");
+			res.send({
+				links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
+				total,
+				totalPages: Math.ceil(total / mongoQuery.options.limit),
+				blog,
+			});
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
-blogsRouter.put("/:blogId", async (req, res, next) => {
-	try {
-		const updateBlog = await BlogModel.findByIdAndUpdate(
-			req.params.usserId,
-			req.body,
-			{ new: true }
-		);
-		if (blog) {
-			res.send(updateBlog);
-		} else {
-			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+blogsRouter.get(
+	"/:blogId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const blog = await BlogModel.findById(req.params.blogId).populate(
+				"author"
+			);
+			if (blog) {
+				res.send(blog);
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
 
-blogsRouter.delete("/:blogId", async (req, res, next) => {
-	try {
-		const deleteBlog = await BlogModel.findByIdAndDelete(req.params.blogId);
-		if (deleteBlog) {
-			res.status(204).send();
-		} else {
-			next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+blogsRouter.put(
+	"/:blogId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const updateBlog = await BlogModel.findByIdAndUpdate(
+				req.params.usserId,
+				req.body,
+				{ new: true }
+			);
+			if (blog) {
+				res.send(updateBlog);
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			next(error);
 		}
-	} catch (error) {
-		next(error);
 	}
-});
+);
+
+blogsRouter.delete(
+	"/:blogId",
+	JWTAuthMiddleware,
+	adminOnlyMiddleware,
+	async (req, res, next) => {
+		try {
+			const deleteBlog = await BlogModel.findByIdAndDelete(req.params.blogId);
+			if (deleteBlog) {
+				res.status(204).send();
+			} else {
+				next(createError(404, `Blog with id ${req.params.blogId} not found!`));
+			}
+		} catch (error) {
+			next(error);
+		}
+	}
+);
 
 // ********************************************** BLOGS COMMENTS ************************************************************
 
