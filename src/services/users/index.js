@@ -64,6 +64,36 @@ usersRouter.get("/me", JWTAuthMiddleware, async (req, res, next) => {
 	}
 });
 
+usersRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
+	try {
+		const modifieCurrentLoggedUser = await UsersModel.findByIdAndUpdate(
+			req.user._id,
+			req.body,
+			{ new: true }
+		);
+		if (modifieCurrentLoggedUser) {
+			res.send({ user: modifieCurrentLoggedUser });
+		} else {
+			next(createError(404, `User with id ${req.user._id} not found`));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
+	try {
+		const deleteCurrentUser = await UsersModel.findByIdAndDelete(req.user._id);
+		if (deleteCurrentUser) {
+			res.status(204).send();
+		} else {
+			next(createError(404, `User with id ${req.user._id} not found`));
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
 usersRouter.get(
 	"/:userId",
 	JWTAuthMiddleware,
