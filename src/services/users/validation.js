@@ -2,13 +2,13 @@ import { checkSchema, validationResult } from "express-validator";
 import createError from "http-errors";
 
 const schema = {
-	firstName: {
+	name: {
 		in: ["body"],
 		isString: {
 			errorMessage: "firstName is missed, try again!",
 		},
 	},
-	lastName: {
+	surname: {
 		in: ["body"],
 		isString: {
 			errorMessage: "lastName is missed, try again!",
@@ -20,7 +20,7 @@ const schema = {
 			errorMessage: "Email is miseed, try again!",
 		},
 	},
-	dateOfBirth: {
+	birthday: {
 		in: ["body"],
 		isDate: {
 			errorMessage: "Date is missed, try again",
