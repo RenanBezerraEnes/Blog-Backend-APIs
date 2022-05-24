@@ -1,6 +1,7 @@
 import express from "express";
 import UsersModel from "./model.js";
 import createError from "http-errors";
+import passport from "passport";
 import { checkUserMiddleware, checkVdalidationResult } from "./validation.js";
 import { sendEmail } from "../../lib/sendEmail.js";
 import { generateJWTToken } from "../../lib/auth/tools.js";
@@ -93,6 +94,23 @@ usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
 		next(error);
 	}
 });
+
+usersRouter.get(
+	"/googleLogin",
+	passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+usersRouter.get(
+	"/googleRedirect",
+	passport.authenticate("google"),
+	async (req, res, next) => {
+		try {
+			res.redirect(`${process.env.FE_URL}?accessToken=${req.user.token}`);
+		} catch (error) {
+			next(error);
+		}
+	}
+);
 
 usersRouter.get(
 	"/:userId",

@@ -8,14 +8,15 @@ const usersScheme = new Schema(
 		name: { type: String, required: true },
 		surname: { type: String, required: true },
 		email: { type: String, required: true },
-		birthday: { type: Date, required: true },
-		password: { type: String, required: true },
+		birthday: { type: Date, required: false },
+		password: { type: String, required: false },
 		role: {
 			type: String,
 			required: true,
 			default: "User",
 			enum: ["User", "Admin"],
 		},
+		googleId: { type: String, required: false },
 	},
 	{
 		timestamps: true,
