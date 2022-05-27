@@ -32,7 +32,11 @@ usersRouter.post("/login", async (req, res, next) => {
 
 		const user = await UsersModel.checkCredencials(email, password);
 		if (user) {
-			const token = await generateJWTToken({ _id: user._id, role: user.role });
+			const token = await generateJWTToken({
+				_id: user._id,
+				role: user.role,
+				email: user.email,
+			});
 			res.send({ accessToken: token });
 		} else {
 			next(createError(401, "Credentials are not valid!"));
@@ -95,6 +99,7 @@ usersRouter.delete("/me", JWTAuthMiddleware, async (req, res, next) => {
 	}
 });
 
+// GOOGLE
 usersRouter.get(
 	"/googleLogin",
 	passport.authenticate("google", { scope: ["profile", "email"] })
