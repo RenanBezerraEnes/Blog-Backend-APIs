@@ -19,7 +19,7 @@ import googleStrategy from "./lib/auth/googleOAuth.js";
 
 const server = express();
 
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 passport.use("google", googleStrategy);
 
