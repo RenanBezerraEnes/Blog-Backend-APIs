@@ -57,7 +57,7 @@ blogsRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
 			.sort(mongoQuery.options.sort)
 			.populate("author");
 		res.send({
-			links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
+			links: mongoQuery.links(`${process.env.API_URL}/blogPosts`, total),
 			total,
 			totalPages: Math.ceil(total / mongoQuery.options.limit),
 			blog,
