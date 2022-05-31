@@ -29,6 +29,7 @@ const loggerMiddleware = (req, res, next) => {
 
 // *************** GLOBAL LEVEL MIDDLEWARES ************
 
+// *************** CORS **********************
 const listOrigins = [process.env.FE_URL, process.env.FE_PRODUCTION_URL];
 
 server.use(

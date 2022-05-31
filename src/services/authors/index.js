@@ -56,7 +56,7 @@ authorsRouter.get(
 				.sort(mongoQuery.options.sort);
 
 			res.send({
-				links: mongoQuery.links(`${process.env.Blogs_API}/blogPosts`, total),
+				links: mongoQuery.links(`${process.env.API_URL}/blogPosts`, total),
 				total,
 				totalPages: Math.ceil(total / mongoQuery.options.limit),
 				authors,
