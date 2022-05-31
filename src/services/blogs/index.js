@@ -35,7 +35,7 @@ blogsRouter.post(
 	}
 );
 
-blogsRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
+blogsRouter.get("/", async (req, res, next) => {
 	try {
 		console.log("MONGO QUERY -->", query2Mongo(req.query));
 
