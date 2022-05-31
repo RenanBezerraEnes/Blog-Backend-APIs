@@ -1,6 +1,7 @@
 import express from "express";
 import listEndpoints from "express-list-endpoints";
 import mongoose from "mongoose";
+import createError from "http-errors";
 import cors from "cors";
 import passport from "passport";
 import expressSession from "express-session";
@@ -29,7 +30,30 @@ const loggerMiddleware = (req, res, next) => {
 
 // *************** GLOBAL LEVEL MIDDLEWARES ************
 
-server.use(cors());
+const listOrigins = [process.env.FE_URL, process.env.FE_PRODUCTION_URL];
+
+server.use(
+	cors({
+		origin: (origin, next) => {
+			// YOU NEED THIS TO CONNECT YOUR FE TO THIS BE
+			console.log("CURRENT ORIGIN: ", origin);
+
+			if (listOrigins.indexOf(origin) !== -1) {
+				// if origin is in the whitelist --> next
+				next(null, true);
+			} else {
+				// if origin is NOT in the whitelist --> trigger an error
+				next(
+					createError(
+						400,
+						`CORS ERROR! Your origin: ${origin} is not in the listOrigins!`
+					)
+				);
+			}
+		},
+	})
+);
+
 server.use(loggerMiddleware);
 server.use(express.json());
 server.use(passport.initialize());
