@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import createError from "http-errors";
 import cors from "cors";
 import passport from "passport";
-import expressSession from "express-session";
 import usersRouter from "./services/users/index.js";
 import authorsRouter from "./services/authors/index.js";
 import blogsRouter from "./services/blogs/index.js";
@@ -54,7 +53,6 @@ server.use(
 server.use(loggerMiddleware);
 server.use(express.json());
 server.use(passport.initialize());
-server.use(expressSession({ secret: process.env.EXPRESS_SECTION_SECRET }));
 
 // HERE I HAVE A ROUTER LEVEL MIDDLEWARE --->
 
