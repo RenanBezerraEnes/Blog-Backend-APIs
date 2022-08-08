@@ -1,57 +1,43 @@
-import { checkSchema, validationResult } from "express-validator";
-import createError from "http-errors";
+import { checkSchema, validationResult } from 'express-validator';
+import createError from 'http-errors';
 
 const schema = {
 	category: {
-		in: ["body"],
+		in: ['body'],
 		isString: {
-			errorMessage: "Category validation failed!",
+			errorMessage: 'Category validation failed!',
 		},
 	},
 	title: {
-		in: ["body"],
+		in: ['body'],
 		isString: {
-			errorMessage: "Title validation failed!",
+			errorMessage: 'Title validation failed!',
 		},
 	},
 	cover: {
-		in: ["body"],
+		in: ['body'],
 		isString: {
-			errorMessage: "Cover validation failed!",
+			errorMessage: 'Cover validation failed!',
 		},
 	},
 	readTime: {
 		value: {
-			in: ["body"],
+			in: ['body'],
 			isNumber: {
-				errorMessage: "Value validation failed!",
+				errorMessage: 'Value validation failed!',
 			},
 		},
 		unit: {
-			in: ["body"],
+			in: ['body'],
 			isString: {
-				errorMessage: "Unit validation failed!",
+				errorMessage: 'Unit validation failed!',
 			},
 		},
 	},
-	// author: {
-	// 	name: {
-	// 		in: ["body"],
-	// 		isString: {
-	// 			errorMessage: "Name validation failed!",
-	// 		},
-	// 	},
-	// 	avatar: {
-	// 		in: ["body"],
-	// 		isString: {
-	// 			errorMessage: "Avatar validation failed!",
-	// 		},
-	// 	},
-	// },
 	content: {
-		in: ["body"],
+		in: ['body'],
 		isString: {
-			errorMessage: "Content validation failed!",
+			errorMessage: 'Content validation failed!',
 		},
 	},
 };
@@ -62,7 +48,7 @@ export const checkVdalidationResult = (req, res, next) => {
 	const errors = validationResult(req);
 	if (!errors.isEmpty()) {
 		next(
-			createError(400, "Validation problems in req.body", {
+			createError(400, 'Validation problems in req.body', {
 				errorsList: errors.array(),
 			})
 		);
